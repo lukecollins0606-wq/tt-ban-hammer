@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TT Ban Hammer</title>
+    <style>
+        body { background: black; color: lime; font-family: Arial; padding: 20px; }
+        input, select, button { width: 100%; padding: 15px; margin: 10px 0; font-size: 18px; }
+        button { background: lime; color: black; font-weight: bold; }
+        #log { height: 300px; overflow-y: scroll; background: #111; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>TikTok Mass Report Bot</h1>
+    <input type="text" id="url" placeholder="Paste full report link here">
+    <input type="number" id="threads" value="30" placeholder="Threads (30)">
+    <select id="reason">
+        <option value="6">Nudity / Sexual</option>
+        <option value="4">Violence</option>
+        <option value="3">Harassment</option>
+        <option value="7">Illegal</option>
+    </select>
+    <button onclick="start()">START MASS REPORT</button>
+    <button onclick="stop()">STOP</button>
+    <div id="log"></div>
+
+    <
