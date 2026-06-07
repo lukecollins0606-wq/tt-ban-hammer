@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TT Ban Hammer</title>
+    <style>
+        body { background: black; color: lime; font-family: Arial; padding: 20px; text-align: center; }
+        input, select, button { width: 90%; padding: 15px; margin: 10px 0; font-size: 18px; }
+        button { background: lime; color: black; font-weight: bold; }
+        #log { height: 400px; overflow-y: scroll; background: #111; padding: 10px; margin: 10px auto; width: 90%; text-align: left; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 TikTok Mass Report Bot</h1>
+    <input type="text" id="url" placeholder="Paste FULL report link here">
+    <input type="number" id="threads" value="30" placeholder="Threads (30)">
+    <select id="reason">
+        <option value="6">Nudity / Sexual (Strongest)</option>
+        <option value="4">Violence</option>
+        <option value="3">Harassment</option>
+        <option value="7">Illegal Activity</option>
+    </select>
+    <button onclick="start()">START MASS REPORT</button>
+    <button onclick="stop()">STOP</button>
+    <div id="log"></div>
+
+    <script>
+        let running = false;
+        let intervals = [];
+        function log(msg) {
+            const logEl = document.getElementById('log');
+            logEl.innerHTML += `<br>${new Date().toLocaleTimeString()} → ${msg}`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        async function sendReport(url, reason) {
+            try {
+                let fixed = url.includes('reason=') ? url.replace(/reason=\d+/, `reason=${reason}`) : url + (url.includes('?')?'&':'?') + `reason=${reason}`;
+                log('Trying: ' + fixed.substring(0, 80) + '...');
+                const res = await fetch(fixed, { 
+                    method: 'GET', 
+                    credentials: 'include',
+                    headers: { 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)' }
+                });
+                if (res.ok) log('✅ Report Sent!');
+                else log(`❌ Failed (${res.status})`);
+            } catch(e) { 
+                log(`❌ ERROR: ${e.message} (This is normal - TikTok blocks direct access)`); 
+            }
+        }
+        function start() {
+            if (running) return;
+            running = true;
+            const url = document.getElementById('url').value.trim();
+            if (!url) return log('❌ Paste a report link first!');
+            const threads = parseInt(document.getElementById('threads').value) || 30;
+            const reason = document.getElementById('reason').value;
+            log('🚀 MASS REPORT STARTED - Watch for errors');
+            for (let i = 0; i < threads; i++) {
+                const int = setInterval(() => { if(running) sendReport(url, reason); }, 150);
+                intervals.push(int);
+            }
+        }
+        function stop() {
+            running = false;
+            intervals.forEach(i => clearInterval(i));
+            log('🛑 Stopped');
+        }
+    </script>
+</body>
+</html>
