@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TT Ban Hammer</title>
+    <style>
+        body { background: black; color: lime; font-family: Arial; padding: 20px; text-align: center; }
+        input, select, button { width: 90%; padding: 15px; margin: 10px 0; font-size: 18px; }
+        button { background: lime; color: black; font-weight: bold; }
+        #log { height: 400px; overflow-y: scroll; background: #111; padding: 10px; margin: 10px auto; width: 90%; text-align: left; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 TikTok Mass Report Bot</h1>
+    <input type="text" id="url" placeholder="Paste @username or profile link">
+    <input type="number" id="threads" value="30" placeholder="Threads (30)">
+    <select id="reason">
+        <option value="6">Nudity / Sexual (Best)</option>
+        <option value="4">Violence</option>
+        <option value="3">Harassment</option>
+        <option value="7">Illegal</option>
+    </select>
+    <button onclick="start()">START MASS REPORT</button>
+    <button onclick="stop()">STOP</button>
+    <div id="log"></div>
+
+    <script>
+        let running = false;
+        let intervals = [];
+        function log(msg) {
+            const logEl = document.getElementById('log');
+            logEl.innerHTML += `<br>${new Date().toLocaleTimeString()} → ${msg}`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function getReportUrl(profileUrl) {
+            // Try to make report URL from profile
+            let username = profileUrl.match(/@([\w.]+)/)?.[1];
+            if (!username) username = profileUrl.replace(/https?:\/\/.*?tiktok.com\//, '').replace(/@/, '').split('?')[0];
+            log('Using username: @' + username);
+            // Common feedback endpoint pattern (may still be blocked)
+            return `https://www.tiktok.com/aweme/v2/aweme/feedback/?aid=1988&report_type=1&object_id=${username}&reason=${'PLACEHOLDER'}`;
+        }
+
+        async function sendReport(baseUrl, reason) {
+            try {
+                let reportUrl = baseUrl.replace('PLACEHOLDER', reason);
+                log('Trying report...');
+                const res = await fetch(reportUrl, { 
+                    method: 'GET', 
+                    credentials: 'include',
+                    headers: { 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)' }
+                });
+                if (res.ok) log('✅ Report Sent!');
+                else log(`❌ ${res.status}`);
+            } catch(e) { 
+                log(`❌ Blocked by TikTok (normal on phone)`); 
+            }
+        }
+
+        function start() {
+            if (running) return;
+            running = true;
+            let url = document.getElementById('url').value.trim();
+            if (!url) return log('❌ Paste profile link first!');
+            const threads = parseInt(document.getElementById('threads').value) || 30;
+            const reason = document.getElementById('reason').value;
+            const baseUrl = getReportUrl(url);
+            log('🚀 MASS REPORT STARTED on @' + url);
+            for (let i = 0; i < threads; i++) {
+                const int = setInterval(() => { if(running) sendReport(baseUrl, reason); }, 200);
+                intervals.push(int);
+            }
+        }
+
+        function stop() {
+            running = false;
+            intervals.forEach(i => clearInterval(i));
+            log('🛑 Stopped');
+        }
+    </script>
+</body>
+</html>
